@@ -1,0 +1,99 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <meta name="google-site-verification" content="hYH0i9Lq_Zj4eokMFpxvok9xhan8Rt9_Ilohw5STtzQ" />
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css"
+        integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
+
+
+    <!-- Bootstrap theme modifier -->
+    <link rel="stylesheet" type="text/css" href="{% static 'global/css/theme.css' %}">
+    <!-- My own stylesheet -->
+    <link rel="stylesheet" type="text/css" href="{% static 'global/css/base-style.css' %}">
+    <title>SSO</title>
+    <style>
+        .container {
+            margin: auto;
+            padding-top: 100px;
+            /* padding: 10% 0; */
+            width: 70%;
+        }
+
+
+        .field-icon {
+            float: right;
+            margin-left: -30px;
+            margin-top: 15px;
+            position: relative;
+            z-index: 2;
+            color: slategrey;
+        }
+
+    </style>
+</head>
+
+<body>
+    <div class="container text-center">
+
+
+        <h1 class="display-1" style="font-variant: small-caps;">SSO</h1>
+        {% if messages %}
+        {% for message in messages %}
+        <br><span class="{{message.tags}}">{{message}}</span>
+        {% endfor %}
+        {% endif%}
+        <div class="row justify-content-center">
+            <div class="col-4">
+                {% if login_error %}
+                <span class="text-danger">
+                    {{login_error}}
+                </span>
+                {% endif %}
+                <form action="/login" method="POST">{% csrf_token %}
+                    <div class="form-group row">
+                        <input type="text" class="form-control form-control-lg" name="email" placeholder="Email">
+                    </div>
+
+                    <div class="form-group row">
+                        <input type="password" class="form-control form-control-lg" name="password" id="password-field"
+                            placeholder="Password">
+                        <span toggle="#password-field" class="fa fa-fw fa-eye field-icon toggle-password"></span>
+                    </div>
+                   <!--  <div id="reset-pwd">
+                        <a href="{% url 'password_reset' %}">Forgot password?</a>
+                    </div> -->
+                    <div class="form-group row justify-content-center">
+                        <div class="col-11">
+                            <button type="submit" class="btn btn-warning btn-block btn-lg text-white">Login</button>
+                        </div>
+                    </div>
+                </form>
+
+            </div>
+        </div>
+
+    </div>
+
+    <!--JQuery-->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+
+    <!-- Toggle View Password -->
+    <script>
+        $(".toggle-password").click(function () {
+            $(this).toggleClass("fa-eye fa-eye-slash");
+            var input = $($(this).attr("toggle"));
+            if (input.attr("type") == "password") {
+                input.attr("type", "text");
+            } else {
+                input.attr("type", "password");
+            }
+        });
+    </script>
+</body>
+
+</html>

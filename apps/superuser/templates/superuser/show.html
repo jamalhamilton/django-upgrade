@@ -1,0 +1,96 @@
+{% extends "layouts/base.html" %}
+{% load static %}
+{% block style %}
+<style>
+    .card {
+        color: black;
+    }
+</style>
+{% endblock %}
+
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row justify-content-center">
+        <div class="col-10">
+            <div class="card bg-light">
+                <div class="card-header">
+                    <h3 class="card-title">{{target_user.first_name}} {{target_user.last_name}}</h3>
+
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-sm-3">User ID: </div>
+                        <div class="col-sm-9">{{target_user.id}}</div>
+                    </div>
+                    <div class="row">
+                        <div class="col-sm-3">Client:</div>
+                        <div class="col-sm-9">{{client}}</div>
+                    </div>
+                    <div class="row">
+                        <div class="col-sm-3">Email:</div>
+                        <div class="col-sm-9">{{target_user.email}}</div>
+                    </div>
+                    <div class="row">
+                        <div class="col-3">Administrator:</div>
+                        <div class="col-sm-9">
+                            {% if target_user.is_admin %}
+                            YES
+                            {% else %}
+                            NO
+                            {% endif %}
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-3">Active:</div>
+                        <div class="col-sm-9">
+                            {% if target_user.is_active %}
+                            YES
+                            {% else %}
+                            NO
+                            {% endif %}
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-3">Superuser:</div>
+                        <div class="col-sm-9">
+                            {% if target_user.is_super %}
+                            YES
+                            {% else %}
+                            NO
+                            {% endif %}
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-sm-3">Created at:</div>
+                        <div class="col-sm-9">{{target_user.created_at}}</div>
+                    </div>
+                    <br>
+                    <div class="row justify-content-center">
+                        <div class="col-sm-4">
+                            <a href="/super/users/{{target_user.id}}/sudo" type="button"
+                                class="btn btn-sm btn-outline-success btn-block">Sudo</a>
+                        </div>
+                        <div class="col-sm-4">
+                            <a href="/super/users/{{target_user.id}}/edit" type="button"
+                                class="btn btn-sm btn-outline-dark btn-block">Edit</a>
+                        </div>
+                        <div class="col-sm-4">
+                            <a href="/super/users/{{target_user.id}}/destroy" type="button"
+                                class="btn btn-sm btn-outline-danger btn-block">Delete</a>
+                        </div>
+                    </div>
+                    <div class="row justify-content-center mt-1">
+                        <div class="col-12">
+                            <a href="/super/users" type="button" class="btn btn-sm btn-outline-dark btn-block">Back to
+                                all users</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+</div>
+{% endblock %}

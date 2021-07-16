@@ -1,0 +1,73 @@
+{% extends "layouts/base.html" %}
+{% load static %}
+{% block style %}
+{% endblock %}
+
+
+{% block content %}
+
+<div class="container-fluid">
+    <div class="row justify-content-around">
+        <h1>Users</h1>
+        <a class="col-4 btn btn-success btn-block btn-lg" type="button" href="/super/users/new">Add a new user</a>
+    </div>
+    <br>
+    <table class="table table-light table-hover table-striped table-bordered table-sm dt-responsive" id="user-table"
+        width="100%">
+        <thead class="thead-light">
+            <tr>
+                <th scope="col">id</th>
+                <th scope="col">Full Name</th>
+                <th scope="col">Client</th>
+                <th scope="col">Email</th>
+                <th scope="col">Active</th>
+                <th scope="col">Attribution</th>
+                <th scope="col">Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for site_user in all_users %}
+            <tr>
+                <td>{{site_user.id}}</td>
+                <td><a href="/super/users/{{site_user.id}}/show">{{site_user.name}}</a></td>
+                <td>{{site_user.client}}</td>
+                <td>{{site_user.email}}</td>
+                <td>
+                    {% if site_user.is_active %}
+                    Yes
+                    {% else %}
+                    No
+                    {% endif %}
+                </td>
+                <td>
+                    {{site_user.has_attribution}}
+                </td>
+                <td>
+<!--                    <a type="button" class="btn btn-outline-success btn-sm"-->
+<!--                        href="/super/users/{{site_user.id}}/sudo">Sudo</a>-->
+                    <a type="button" class="btn btn-outline-primary btn-sm"
+                        href="/super/users/{{site_user.id}}/show">Show</a>
+                    <a type="button" class="btn btn-outline-primary btn-sm"
+                        href="/super/users/{{site_user.id}}/edit">Edit</a>
+                    <a type="button" class="btn btn-outline-danger btn-sm"
+                        href="/super/users/{{site_user.id}}/destroy">Delete</a>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+</div>
+
+{% endblock %}
+
+{% block scripts %}
+<script>
+    $(document).ready(function () {
+        $('#user-table').DataTable({
+            "lengthMenu": [[25, 50, 100, -1], [25, 50, 100, "All"]]
+        });
+    });
+</script>
+
+{% endblock %}

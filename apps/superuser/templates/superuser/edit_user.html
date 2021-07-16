@@ -1,0 +1,142 @@
+{% extends "layouts/base.html" %}
+{% load static %}
+{% block style %}
+<style>
+    .card {
+        color: black;
+    }
+</style>
+{% endblock %}
+
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row justify-content-center">
+        <div class="col-10">
+            <div class="card bg-light">
+                <div class="card-header">
+                    <h3 class="card-title">Edit User: {{target_user.first_name}} {{target_user.last_name}}</h3>
+
+                </div>
+                <div class="card-body">
+                    <form action="/super/users/update" method="POST">
+                        {% csrf_token %}
+                        <div class="form-group row">
+                            <label for="first_name" class="col-sm-3 col-form-label">
+                                First Name
+                            </label>
+                            <div class="col-sm-9">
+                                <input type="text" class="form-control" name="first_name"
+                                    value="{{target_user.first_name}}">
+                                {% if 'first_name' in errors %}
+                                <small class="form-text text-danger">
+                                    {{errors.first_name}}
+                                </small>
+                                {% endif %}
+                                </small>
+                            </div>
+                        </div>
+                        <div class="form-group row">
+                            <label for="last_name" class="col-sm-3 col-form-label">
+                                Last Name
+                            </label>
+                            <div class="col-sm-9">
+                                <input type="text" class="form-control" name="last_name"
+                                    value="{{target_user.last_name}}">
+                                {% if 'last_name' in errors %}
+                                <small class="form-text text-danger">
+                                    {{errors.last_name}}
+                                </small>
+                                {% endif %}
+                                </small>
+                            </div>
+                        </div>
+                        <div class="form-group row">
+                            <label for="client" class="col-sm-3 col-form-label">Client</label>
+                            <div class="col-sm-9 ">
+                                <select name="client" class="form-control">
+                                    {% for client in all_clients %}
+                                    <option value="{{client.client_id}}" {% if client.client_id == target_user.client_id %} selected {% endif %}>{{client}} </option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-group row">
+                            <label for="email" class="col-sm-3 col-form-label">
+                                Email
+                            </label>
+                            <div class="col-sm-9">
+                                <input type="text" class="form-control" name="email" value="{{target_user.email}}">
+                                {% if 'email' in errors %}
+                                <small class="form-text text-danger">
+                                    {{errors.email}}
+                                </small>
+                                {% endif %}
+                                </small>
+                            </div>
+                        </div>
+                        <div class="form-group row">
+                            <span class="col-sm-3">Administrator</span>
+                            <div class="col-sm-9">
+
+                                <label class="mr-3">
+                                    <input type="radio" class="mr-1" name="is_admin" value="True" {% if target_user.is_admin %}checked{% endif %}> YES
+                                </label>
+                                <label class="mr-3">
+                                    <input type="radio" class="mr-1" name="is_admin" value="False" {% if not target_user.is_admin %}checked{% endif %}> NO
+                                </label>
+                            </div>
+                        </div>
+
+                        <div class="form-group row">
+                            <span class="col-sm-3">Active</span>
+                            <div class="col-sm-9">
+
+                                <label class="mr-3">
+                                    <input type="radio" class="mr-1" name="is_active" value="True" {% if target_user.is_active %}checked{% endif %}> YES
+                                </label>
+                                <label class="mr-3">
+                                    <input type="radio" class="mr-1" name="is_active" value="False" {% if not target_user.is_active %}checked{% endif %}> NO
+                                </label>
+                            </div>
+                        </div>
+                        <div class="form-group row">
+                            <span class="col-sm-3">Superuser</span>
+                            <div class="col-sm-9">
+
+                                <label class="mr-3">
+                                    <input type="radio" class="mr-1" name="is_super" value="True" {% if target_user.is_super %}checked{% endif %}> YES
+                                </label>
+                                <label class="mr-3">
+                                    <input type="radio" class="mr-1" name="is_super" value="False" {% if not target_user.is_super %}checked{% endif %}> NO
+                                </label>
+                            </div>
+                        </div>
+
+
+                        <input type="hidden" name="id" value="{{target_user.id}}">
+                        <input type="submit" class="btn btn-outline-success btn-block" value="Update">
+                    </form>
+                </div>
+                <div class="card-footer">
+                    <div class="row justify-content-center">
+                        <div class="col-sm-4">
+                            <a href="/super/users/{{target_user.id}}/show" type="button"
+                                class="btn btn-outline-dark btn-block">Show</a>
+                        </div>
+                        <div class="col-sm-4">
+                            <a href="/super/users/{{target_user.id}}/destroy" type="button"
+                                class="btn btn-outline-danger btn-block">Delete</a>
+                        </div>
+                        <div class="col-sm-4">
+                            <a href="/super/users" type="button" class="btn btn-outline-dark btn-block">Back to all
+                                users</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
