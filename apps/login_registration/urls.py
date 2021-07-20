@@ -16,4 +16,5 @@ urlpatterns = [
     path("login", views.login,name="authlogin"),
     path("reset", views.reset),
     path("accounts/", include("django.contrib.auth.urls")),
+    path('accounts/login/', views.MyLoginView.as_view(), {'template_name': 'login.html'}, name='login'),
 ]

@@ -6,6 +6,8 @@ from django.shortcuts import HttpResponse, redirect, render
 from django.contrib.auth import authenticate, login as auth_login
 from apps.login_registration.models import Client, User
 from apps.onboarding.models import Region
+from django.contrib.auth.views import LoginView
+from .forms import MyAuthForm
 from collections import defaultdict
 from django.db.models import Sum
 from apps.onboarding.models import Client, HasAttribution, Region
@@ -13,6 +15,11 @@ from apps.onboarding.models import Client, HasAttribution, Region
 
 def home(request):
     return render(request, "login_registration/main.html",)
+
+
+class MyLoginView(LoginView):
+    authentication_form = MyAuthForm
+
 def superadmin(request):
     if not request.user.is_authenticated:
         # user is not logged in
@@ -190,11 +197,11 @@ def login(request):
                     request.session[
                         "login_error"
                     ] = "Our records indicate that either you do not have an active contract with Audantic, or you have an open invoice. Please contact support@audantic.com to sign back up or arrange payment and continue your access to SSO"
-                    return redirect("/")
+                    return redirect("/superadmin")
         request.session[
             "login_error"
         ] = "The login and password combination did not match any user. Check your credentials. "
-    return redirect("/")
+    return redirect("/superadmin")
 
 
 def reset(request):
@@ -203,3 +210,4 @@ def reset(request):
     """
     request.session.clear()
     return redirect("/")
+{"mode":"full","isActive":false}
