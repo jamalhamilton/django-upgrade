@@ -210,4 +210,4 @@ def reset(request):
     """
     request.session.clear()
     return redirect("/")
-{"mode":"full","isActive":false}
+# {"mode":"full","isActive":False}
