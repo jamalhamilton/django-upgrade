@@ -109,6 +109,24 @@ DATABASES = {
         "NAME": "paretodb",
         "OPTIONS": {"init_command": "SET sql_mode='STRICT_TRANS_TABLES'",},
     },
+    "liveloop": {
+        "ENGINE": "django.db.backends.mysql",
+        "HOST": config("LIVELOOP_DATABASE_URL"),
+        "USER": config("LIVELOOP_DB_USER"),
+        "PASSWORD": config("LIVELOOP_DB_PASSWORD"),
+        "NAME": config("LIVELOOP_DB_NAME"),
+        "OPTIONS": {"init_command": "SET sql_mode='STRICT_TRANS_TABLES'",},
+    },
+    "buyersonar": {
+        "ENGINE": "django.db.backends.mysql",
+        "HOST": config("BUYER_SONAR_DATABASE_URL"),
+        "USER": config("BUYER_SONAR_DB_USER"),
+        "PASSWORD": config("BUYER_SONAR_DB_PASSWORD"),
+        "NAME": config("BUYER_SONAR_DB_NAME"),
+        "OPTIONS": {
+            "init_command": "SET sql_mode='STRICT_TRANS_TABLES'",
+        },
+    },
 }
 
 DATABASE_ROUTERS = ["apps.onboarding.router.ParetoRouter"]
