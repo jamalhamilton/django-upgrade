@@ -33,12 +33,12 @@ class UserManager(BaseUserManager):
 
     def create_superuser(self, email, password, **extra_fields):
         extra_fields.setdefault('is_staff', True)
-        extra_fields.setdefault('is_superuser', True)
+        extra_fields.setdefault('is_super', True)
 
         if extra_fields.get('is_staff') is not True:
             raise ValueError('Superuser must have is_staff=True.')
-        if extra_fields.get('is_superuser') is not True:
-            raise ValueError('Superuser must have is_superuser=True.')
+        if extra_fields.get('is_super') is not True:
+            raise ValueError('Superuser must have is_super=True.')
 
         return self._create_user(email, password, **extra_fields)
 
@@ -106,7 +106,6 @@ class User(AbstractBaseUser):
     is_super = models.BooleanField(default=False)
     is_staff = models.BooleanField(default=False)
     is_active = models.BooleanField(default=True)
-    is_superuser = models.BooleanField(default=False)
 
     USERNAME_FIELD = "email"
     REQUIRED_FIELDS = []
@@ -132,7 +131,7 @@ class User(AbstractBaseUser):
         """
         return self.first_name
     def has_perm(self, perm, obj=None):
-        return self.is_superuser
+        return self.is_super
 
     def has_module_perms(self, app_label):
-        return self.is_superuser
+        return self.is_super

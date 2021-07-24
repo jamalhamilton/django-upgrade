@@ -237,7 +237,16 @@ def destroy(request, user_id):
     if request.user.is_authenticated:
         user = request.user
         if user.is_super:
-            User.objects.get(id=user_id).delete()
+            user_to_delete = User.objects.get(id=user_id)
+            try:
+                User.objects.filter(email=user_to_delete.email).using('buyersonar').delete()
+            except:
+                pass
+            try:
+                User.objects.filter(email=user_to_delete.email).using('liveloop').delete()
+            except:
+                pass           
+            user_to_delete.delete() 
             return redirect("/super/users")
     return redirect("/")
 
@@ -272,6 +281,18 @@ def update(request):
             user.is_admin = strtobool(request.POST["is_admin"])
             user.is_active = strtobool(request.POST["is_active"])
             user.is_super = strtobool(request.POST["is_super"])
+            try:
+                User.objects.filter(email=request.POST["email"]).using('liveloop').update(first_name=request.POST["first_name"], last_name=request.POST["last_name"],
+                    email=request.POST["email"], is_admin=strtobool(request.POST["is_admin"]), is_active=strtobool(request.POST["is_active"]),
+                    is_super=strtobool(request.POST["is_super"]), client_id=None if request.POST["client"] == "" else request.POST["client"])
+            except:
+                pass
+            try:
+                User.objects.filter(email=request.POST["email"]).using('buyersonar').update(first_name=request.POST["first_name"], last_name=request.POST["last_name"],
+                    email=request.POST["email"], is_admin=strtobool(request.POST["is_admin"]), is_active=strtobool(request.POST["is_active"]),
+                    is_super=strtobool(request.POST["is_super"]), client_id=None if request.POST["client"] == "" else request.POST["client"])
+            except:
+                pass
             user.save()
             request.session["errors"] = {}
             # that is back to "show"
