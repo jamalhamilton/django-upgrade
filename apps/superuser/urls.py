@@ -4,6 +4,7 @@ These url paths come after 'superuser/'
 from . import views
 from django.urls import path
 
+app_name = "superadmin"
 urlpatterns = [
     path("users", views.users_dashboard),
     path("users/<int:user_id>/show", views.show),
@@ -14,4 +15,8 @@ urlpatterns = [
     path("users/new", views.new),
     path("users/create", views.create),
     path("bypass", views.bypass),
+    path("company_management", views.company_management, name="company-management"),
+    path("company/add", views.AddCompanyView.as_view(), name="add-company"),
+    path("company/update/<int:company_id>", views.AddCompanyView.as_view(), name="update-company"),
+    path("company/delete/<int:company_id>", views.DeleteCompanyView.as_view(), name="delete-company"),
 ]

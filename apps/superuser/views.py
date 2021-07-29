@@ -6,10 +6,16 @@ from distutils.util import strtobool
 
 from django.db.models import Sum
 from django.shortcuts import redirect, render
-
+from django.views.generic import FormView, RedirectView
+from django.urls import reverse
+from django.contrib.auth.decorators import user_passes_test
+from django.http import Http404, HttpResponse
+from django.http.response import JsonResponse
 from apps.login_registration.models import User
 from apps.onboarding.models import Client, HasAttribution, Region
-
+from apps.login_registration.models import Company
+from apps.superuser.forms import AddCompanyForm
+from SSOPortal.core.decorators import logged_user_view
 
 def users_dashboard(request):
     """
@@ -127,6 +133,7 @@ def new(request):
                 "errors": request.session["errors"],
                 "partial": request.session["form_data"],
                 "all_clients": Client.objects.order_by("client_name"),
+                "all_companies": Company.objects.using('buyersonar').order_by('name'),
             }
             return render(request, "superuser/new_user.html", context)
 
@@ -153,6 +160,7 @@ def edit(request, user_id):
                 "user": f"{user.first_name} {user.last_name}",
                 "target_user": User.objects.get(id=user_id),
                 "all_clients": Client.objects.order_by("client_name"),
+                "all_companies": Company.objects.using('buyersonar').order_by('name'),
                 "errors": request.session["errors"],
                 "superuser_links": links,
                 "attribution": "disabled",
@@ -275,6 +283,7 @@ def update(request):
             user.first_name = request.POST["first_name"]
             user.last_name = request.POST["last_name"]
             user.email = request.POST["email"]
+            user.company_id = request.POST["company"]
             user.client_id = (
                 None if request.POST["client"] == "" else request.POST["client"]
             )
@@ -284,13 +293,15 @@ def update(request):
             try:
                 User.objects.filter(email=request.POST["email"]).using('liveloop').update(first_name=request.POST["first_name"], last_name=request.POST["last_name"],
                     email=request.POST["email"], is_admin=strtobool(request.POST["is_admin"]), is_active=strtobool(request.POST["is_active"]),
-                    is_super=strtobool(request.POST["is_super"]), client_id=None if request.POST["client"] == "" else request.POST["client"])
+                    is_super=strtobool(request.POST["is_super"]), client_id=None if request.POST["client"] == "" else request.POST["client"],
+                    company_id=None if request.POST["company"] == "" else request.POST["company"])
             except:
                 pass
             try:
                 User.objects.filter(email=request.POST["email"]).using('buyersonar').update(first_name=request.POST["first_name"], last_name=request.POST["last_name"],
                     email=request.POST["email"], is_admin=strtobool(request.POST["is_admin"]), is_active=strtobool(request.POST["is_active"]),
-                    is_super=strtobool(request.POST["is_super"]), client_id=None if request.POST["client"] == "" else request.POST["client"])
+                    is_super=strtobool(request.POST["is_super"]), client_id=None if request.POST["client"] == "" else request.POST["client"],
+                    company_id=None if request.POST["company"] == "" else request.POST["company"])
             except:
                 pass
             user.save()
@@ -319,3 +330,82 @@ def bypass(request):
     """
     request.session["bypass"] = True
     return redirect("/attribution")
+
+def company_management(request):
+    '''
+    This view is to handle the companies data
+    '''
+    if not request.user.is_authenticated:
+        # user is not logged in
+        return redirect("/")
+    else:
+        context = {
+            'all_companies': Company.objects.using('buyersonar').order_by('name')
+        }
+        return render(request, "superuser/company_management.html", context)        
+
+class AddCompanyView(FormView):
+
+    form_class = AddCompanyForm
+    template_name = "superuser/add_company.html"
+
+    def form_valid(self, form):
+        form.save()
+        return super(AddCompanyView, self).form_valid(form) 
+
+    def get_success_url(self):
+        url = reverse('superadmin:company-management')
+        return url
+    
+    def get_form_kwargs(self):
+        data = super().get_form_kwargs()
+
+        try:
+            company = self.kwargs['company_id']
+        except:
+            company = None
+
+        data.update({
+                     'company': company,
+                    })
+        return data
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        try:
+            context['company'] = Company.objects.filter(id=self.kwargs['company_id']).using("buyersonar").first()
+        except:
+            context['company'] = None
+        
+        return context
+        
+    def get_initial(self):
+        initial = super(AddCompanyView, self).get_initial()
+
+        if 'company_id' in self.kwargs:
+            if not self.request.user.is_authenticated:
+                return ("/")
+            else:
+                company = Company.objects.filter(id=self.kwargs['company_id']).using("buyersonar").first()
+                initial.update({
+                    'name': company.name,
+                    'max_regions' : company.max_regions,
+                    'max_users' : company.max_users,
+                    'is_active' : company.is_active,
+                    'skip_credits' : company.skip_credits,
+                    'env_access' : company.env_access
+                    })
+        return initial
+
+@logged_user_view
+class DeleteCompanyView(RedirectView):
+
+    def get(self, *args, **kwargs): 
+        if self.request.user.is_super:
+            try:
+                Company.objects.filter(id=kwargs['company_id']).using("buyersonar").delete()
+            except:
+                raise Http404
+        else:
+            raise Http404
+        return redirect("superadmin:company-management")

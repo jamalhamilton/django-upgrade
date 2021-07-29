@@ -1,0 +1,191 @@
+{% extends "layouts/base.html" %}
+{% load static %}
+{% block style %}
+<style>
+
+h3, label, span, p, a, div{
+    color: black !important;
+}
+
+</style>
+
+{% endblock %}
+
+
+{% block content %}
+<div class="card bg-light">
+    <div class="card-header">
+        <h3 class="card-title">
+            {% if form.name.value %} Edit Company: {{form.name.value}} {% else %} Add Company {% endif %} 
+        </h3>
+    </div>
+    <div class="card-body">
+        <form class="company_form" action="" method="POST">
+            {% csrf_token %}
+            <div class="form-group row">
+                <label for="name" class="col-sm-4 col-form-label">
+                    Name
+                </label>
+                <div class="col-sm-8">
+                    <input type="text" class="form-control" name="{{form.name.name}}"
+                        value="{% if form.name.value %}{{form.name.value}}{% endif %}">
+                    {% if 'company_name' in errors %}
+                    <small class="form-text text-danger">
+                        {{errors.company_name}}
+                    </small>
+                    {% endif %}
+                </div>
+            </div>
+
+            <div class="form-group row">
+                <label for="max_regions" class="col-sm-4 col-form-label">
+                    Max. Regions
+                </label>
+                <div class="col-sm-8">
+                    <input type="number" min="1" class="form-control" name="max_regions"
+                        value="{% if form.max_regions.value %}{{form.max_regions.value}}{% endif %}">
+                    {% if 'max_regions' in errors %}
+                    <small class="form-text text-danger">
+                        {{errors.max_regions}}
+                    </small>
+                    {% endif %}
+                </div>
+            </div>
+            
+            <div class="form-group row">
+                <label for="max_users" class="col-sm-4 col-form-label">
+                    Max. Users
+                </label>
+                <div class="col-sm-8">
+                    <input type="number" min="1" class="form-control" name="max_users"
+                        value="{% if form.max_users.value %}{{form.max_users.value}}{% endif %}">
+                    {% if 'max_users' in errors %}
+                    <small class="form-text text-danger">
+                        {{errors.max_users}}
+                    </small>
+                    {% endif %}
+                </div>
+            </div>
+            <div class="form-group row">
+                <label for="skip_credits" class="col-sm-4 col-form-label">
+                    Skiptrace Creds:
+                </label>
+                <div class="col-sm-8">
+                    <input type="number" min="0" class="form-control" name="skip_credits"
+                        value="{% if form.skip_credits.value %}{{form.skip_credits.value}}{% endif %}" oninput="this.value = Math.abs( this.value)">
+                </div>
+            </div>
+
+            <div class="form-group row">
+                <span class="col-sm-4">
+                    <a href="#" data-toggle="popover" data-placement="bottom" data-trigger="focus" data-content="An active company has at least one region currently paid for">
+                        <i class="far fa-question-circle"></i>
+                    </a> 
+                    Active
+                </span>
+                <div class="col-sm-8">
+
+                    <div class="form-check form-check-inline">
+                        <input id="active-yes" type="radio" class="form-check-input" name="is_active" value="True"
+                        {% if form.is_active.value == True %}checked{% endif %}> 
+                        <label class="form-check-label" for="active-yes">YES</label> 
+                    </div>
+                    <div class="form-check form-check-inline">
+                        <input id="active-no" type="radio" class="form-check-input" name="is_active" value="False"
+                        {% if form.is_active.value == False %}checked{% endif %}> 
+                        <label class="form-check-label" for="active-no">NO</label> 
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-group row">
+                <span class="col-sm-4">
+                    <a href="#" data-toggle="popover" data-placement="bottom" data-trigger="focus" data-content="Which site(s) should this company have access to? Production: public site (default), Beta: Testing select new features, Dev: Audantic and test users only">
+                        <i class="far fa-question-circle"></i>
+                    </a> 
+                    Environment Access
+                </span>
+                <div class="col-sm-8">
+
+                    <div class="form-check">
+                        <input id="env_access_prod" type="radio" class="form-check-input" name="env_access" value="prod"
+                            {% if form.env_access.value == "prod" %}checked{% endif %}> 
+                            <label class="form-check-label" for="env_access_prod">
+                                Production 
+                            </label>
+                    </div>
+                    <div class="form-check">
+                        <input id="env_access_beta" type="radio" class="form-check-input" name="env_access" value="beta"
+                            {% if form.env_access.value == "beta" %}checked{% endif %}> 
+                            <label class="form-check-label" for="env_access_beta">
+                                Production and Beta
+                            </label>
+                    </div>
+                    <div class="form-check">
+                        <input id="env_access_all" type="radio" class="form-check-input" name="env_access" value="all"
+                            {% if form.env_access.value == "all" %}checked{% endif %}> 
+                            <label class="form-check-label" for="env_access_all">
+                                Production, Beta, and Dev
+                            </label>
+                    </div>
+                </div>
+            </div>
+
+
+            <input type="hidden" name="user_id" value="{{target_user.id}}">
+            <input type="hidden" name="id" value="{{company.id}}">
+            {% if form.name.value %} 
+            <input type="submit" class="btn btn-outline-success col-11" id="update-co" value="Update Company">
+            {% else %} 
+            <input type="submit" class="btn btn-outline-success col-11" id="update-co" value="Add Company">
+            {% endif %} 
+            
+        </form>
+    </div>
+    <div class="card-footer">
+        <div class="row justify-content-around">
+            {% if company %}
+            <div class="col-sm-4">
+                <a type="button" class="btn btn-outline-danger btn-block" data-toggle="modal"
+                    data-target="#delete-company-alert">Delete</a>
+            </div>
+            {% endif %}
+            <div class="col-sm-4">
+                <a href="{% url 'superadmin:company-management' %}" type="button" class="btn btn-outline-dark btn-block">All
+                    Companies</a>
+            </div>
+        </div>
+    </div>
+
+</div>
+<div class="modal fade" id="delete-company-alert" tabindex="-1" role="dialog"
+    aria-labelledby="delete-company-alertLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+
+            <div class="modal-body">
+                <p>
+                    Are you sure you want to delete company {{company.name}}? This will also delete all its users:
+                <ul>
+                    {% for co_user in company_users %}
+                    <li>{{co_user.first_name}} {{co_user.last_name}}</li>
+                    {% endfor %}
+                </ul>
+                This operation cannot be undone.
+                </p>
+                <p>
+                    Unless this was a test company or a company created by mistake, we recommend deactivating the
+                    company instead.
+                </p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                {% if company %}
+                <a type="button" class="btn btn-danger" href="{% url 'superadmin:delete-company' company_id=company.id %}">Delete
+                    Company</a>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

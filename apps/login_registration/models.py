@@ -135,3 +135,17 @@ class User(AbstractBaseUser):
 
     def has_module_perms(self, app_label):
         return self.is_super
+
+class Company(models.Model):
+    name = models.CharField(max_length=255)
+    max_regions = models.IntegerField(default=1)
+    max_users = models.IntegerField(default=3)
+    is_active = models.BooleanField(default=False)
+    skip_credits = models.IntegerField(default=200)
+    env_access = models.CharField(max_length=10, default="prod")
+
+    def __str__(self):
+        return self.name
+
+    class Meta:
+        verbose_name_plural = "companies"

@@ -21,6 +21,6 @@ sso_server = Server()
 urlpatterns = [
     path('admin/', admin.site.urls),
     path("", include("apps.login_registration.urls")),
-    path("super/", include("apps.superuser.urls")),
+    path("super/", include("apps.superuser.urls", namespace="superadmin")),
     path('server/', include(sso_server.get_urls())),
 ]

@@ -62,6 +62,16 @@
                             </div>
                         </div>
                         <div class="form-group row">
+                            <label for="client" class="col-sm-3 col-form-label">Company</label>
+                            <div class="col-sm-9 ">
+                                <select name="company" class="form-control">
+                                    {% for company in all_companies %}
+                                    <option value="{{company.id}}" {% if company.id == target_user.company_id %} selected {% endif %}>{{company}} </option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-group row">
                             <label for="email" class="col-sm-3 col-form-label">
                                 Email
                             </label>
