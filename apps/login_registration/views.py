@@ -4,6 +4,7 @@ Views related to login and registration
 from django.contrib import messages
 from django.shortcuts import HttpResponse, redirect, render
 from django.contrib.auth import authenticate, login as auth_login
+from django.conf import settings
 from apps.login_registration.models import Client, User
 from apps.onboarding.models import Region
 from django.contrib.auth.views import LoginView
@@ -125,6 +126,7 @@ def index(request):
     """
     # if already logged in, don't show login page
     # if request.user.is_authenticated:
+    return redirect(settings.BUYERSONAR_WEBSITE_URL)
     return render(request, "login_registration/main.html", )
         # return redirect("/success")
         # return redirect("/main")
