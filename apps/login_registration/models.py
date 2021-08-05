@@ -32,11 +32,11 @@ class UserManager(BaseUserManager):
         return user
 
     def create_superuser(self, email, password, **extra_fields):
-        extra_fields.setdefault('is_staff', True)
+        # extra_fields.setdefault('is_staff', True)
         extra_fields.setdefault('is_super', True)
 
-        if extra_fields.get('is_staff') is not True:
-            raise ValueError('Superuser must have is_staff=True.')
+        # if extra_fields.get('is_staff') is not True:
+        #     raise ValueError('Superuser must have is_staff=True.')
         if extra_fields.get('is_super') is not True:
             raise ValueError('Superuser must have is_super=True.')
 
@@ -102,9 +102,10 @@ class User(AbstractBaseUser):
     updated_at = models.DateTimeField(auto_now=True)
     client_id = models.IntegerField(blank=True, null=True)
     company_id = models.IntegerField(blank=True, null=True)
+    is_buyersonar_user = models.BooleanField(default=True)
+    is_liveloop_user = models.BooleanField(default=True)
     is_admin = models.BooleanField(default=False)
     is_super = models.BooleanField(default=False)
-    is_staff = models.BooleanField(default=False)
     is_active = models.BooleanField(default=True)
 
     USERNAME_FIELD = "email"

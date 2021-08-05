@@ -47,7 +47,7 @@ def superadmin(request):
     else:
         request.session["errors"] = {}
         user = request.user
-        if user.is_super:
+        if user.is_super or user.is_admin:
             links = "<li class='nav-item'> <a class='nav-link active' href='/super/users'>Users</a></li>"
             user_list = User.objects.all()
             clients = Client.objects.all()

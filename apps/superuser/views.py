@@ -221,14 +221,18 @@ def create(request):
             request.session["form_data"] = request.POST
             return redirect("/super/users/new")
         client = None if request.POST["client"] == "" else request.POST["client"]
+        company = None if request.POST["company_id"] == "" else request.POST["company_id"]
         user = User.objects.create(
             first_name=request.POST["first_name"],
             last_name=request.POST["last_name"],
             email=request.POST["email"],
             client_id=client,
+            company_id = company,
             is_admin=strtobool(request.POST["is_admin"]),
             is_active=strtobool(request.POST["is_active"]),
             is_super=strtobool(request.POST["is_super"]),
+            is_buyersonar_user = strtobool(request.POST['is_buyersonar_user']),
+            is_liveloop_user = strtobool(request.POST['is_liveloop_user'])
         )
         password = User.objects.make_random_password(length=16)
         user.set_password(password)
@@ -284,6 +288,8 @@ def update(request):
             user.last_name = request.POST["last_name"]
             user.email = request.POST["email"]
             user.company_id = request.POST["company"]
+            user.is_buyersonar_user = strtobool(request.POST['is_buyersonar_user'])
+            user.is_liveloop_user = strtobool(request.POST['is_liveloop_user'])
             user.client_id = (
                 None if request.POST["client"] == "" else request.POST["client"]
             )
@@ -294,14 +300,16 @@ def update(request):
                 User.objects.filter(email=request.POST["email"]).using('liveloop').update(first_name=request.POST["first_name"], last_name=request.POST["last_name"],
                     email=request.POST["email"], is_admin=strtobool(request.POST["is_admin"]), is_active=strtobool(request.POST["is_active"]),
                     is_super=strtobool(request.POST["is_super"]), client_id=None if request.POST["client"] == "" else request.POST["client"],
-                    company_id=None if request.POST["company"] == "" else request.POST["company"])
+                    company_id=None if request.POST["company"] == "" else request.POST["company"],
+                    is_buyersonar_user = strtobool(request.POST['is_buyersonar_user']), is_liveloop_user = strtobool(request.POST['is_liveloop_user']))
             except:
                 pass
             try:
                 User.objects.filter(email=request.POST["email"]).using('buyersonar').update(first_name=request.POST["first_name"], last_name=request.POST["last_name"],
                     email=request.POST["email"], is_admin=strtobool(request.POST["is_admin"]), is_active=strtobool(request.POST["is_active"]),
                     is_super=strtobool(request.POST["is_super"]), client_id=None if request.POST["client"] == "" else request.POST["client"],
-                    company_id=None if request.POST["company"] == "" else request.POST["company"])
+                    company_id=None if request.POST["company"] == "" else request.POST["company"],
+                    is_buyersonar_user = strtobool(request.POST['is_buyersonar_user']), is_liveloop_user = strtobool(request.POST['is_liveloop_user']))
             except:
                 pass
             user.save()
@@ -339,8 +347,12 @@ def company_management(request):
         # user is not logged in
         return redirect("/")
     else:
+        if request.user.is_super:
+            companies = Company.objects.using('buyersonar').order_by('name')
+        elif request.user.is_admin:
+            companies = Company.objects.filter(id=request.user.company_id).using('buyersonar').order_by('name')
         context = {
-            'all_companies': Company.objects.using('buyersonar').order_by('name')
+            'all_companies': companies
         }
         return render(request, "superuser/company_management.html", context)        
 
