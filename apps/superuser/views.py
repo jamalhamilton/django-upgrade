@@ -32,6 +32,8 @@ def users_dashboard(request):
             user_list = User.objects.all()
             clients = Client.objects.all()
             clients = {x.client_id: x for x in clients}
+            companies = Company.objects.all().using('buyersonar')
+            companies = {x.id: x for x in companies}            
             internal_regions = Region.objects.filter(
                 client_id__in=[1, 225]
             ).values_list("region_id", flat=True)
@@ -83,6 +85,9 @@ def users_dashboard(request):
                     "name": site_user.first_name + " " + site_user.last_name,
                     "client": clients.get(site_user.client_id)
                     if site_user.client_id is not None
+                    else None,
+                    "company":companies.get(site_user.company_id)
+                    if site_user.company_id is not None
                     else None,
                     "email": site_user.email,
                     "is_active": site_user.is_active,
