@@ -8,6 +8,7 @@ from django.conf import settings
 from apps.login_registration.models import Client, User
 from apps.onboarding.models import Region
 from django.contrib.auth.views import LoginView
+from apps.login_registration.models import Company
 from .forms import MyAuthForm
 from collections import defaultdict
 from django.db.models import Sum
@@ -52,6 +53,8 @@ def superadmin(request):
             user_list = User.objects.all()
             clients = Client.objects.all()
             clients = {x.client_id: x for x in clients}
+            companies = Company.objects.all().using('buyersonar')
+            companies = {x.id: x for x in companies}   
             internal_regions = Region.objects.filter(
                 client_id__in=[1, 225]
             ).values_list("region_id", flat=True)
@@ -104,6 +107,9 @@ def superadmin(request):
                     "client": clients.get(site_user.client_id)
                     if site_user.client_id is not None
                     else None,
+                    "company":companies.get(site_user.company_id)
+                    if site_user.company_id is not None
+                    else None,                    
                     "email": site_user.email,
                     "is_active": site_user.is_active,
                     "has_attribution": attribution,
