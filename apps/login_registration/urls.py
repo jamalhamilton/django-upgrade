@@ -12,7 +12,6 @@ urlpatterns = [
     path("", views.index),
     path("success", views.success),
     path("main", views.home),
-    path("superadmin", views.superadmin),
     path("login", views.login,name="authlogin"),
     path("reset", views.reset),
     path("accounts/", include("django.contrib.auth.urls")),

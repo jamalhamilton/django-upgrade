@@ -23,13 +23,35 @@ def users_dashboard(request):
     """
     if not request.user.is_authenticated:
         # user is not logged in
-        return redirect("/")
+        if "errors" not in request.session:
+            request.session["errors"] = {}
+            request.session["form_data"] = {
+                "first_name": "",
+                "last_name": "",
+                "email": "",
+            }
+        if "login_error" not in request.session:
+            request.session["login_error"] = None
+
+        # send in context the error messages (a dictionary where the keys are the fields and the values are the messages)
+        # and the previously entered (incorrect) form data
+        context = {
+            "errors": request.session["errors"],
+            "partial": request.session["form_data"],
+            "login_error": request.session["login_error"],
+        }
+        request.session.clear()
+        return render(request, "login_registration/index.html", context)
+
     else:
         request.session["errors"] = {}
         user = request.user
-        if user.is_super:
+        if user.is_super or user.is_admin:
             links = "<li class='nav-item'> <a class='nav-link active' href='/super/users'>Users</a></li>"
-            user_list = User.objects.all()
+            if user.is_super:
+                user_list = User.objects.all()
+            elif user.is_admin:
+                user_list = User.objects.filter(company_id=user.company_id)
             clients = Client.objects.all()
             clients = {x.client_id: x for x in clients}
             companies = Company.objects.all().using('buyersonar')
@@ -95,7 +117,7 @@ def users_dashboard(request):
                 }
                 all_users.append(mod_user)
             context = {
-                "user": f"{user.first_name} {user.last_name}",
+                "user": user,
                 "all_users": all_users,
                 "superuser_links": links,
                 "attribution": "disabled",
@@ -133,7 +155,7 @@ def new(request):
                 }
             # send in context the error messages (a dictionary where the keys are the fields and the values are the messages) and the previously entered (incorrect) form data
             context = {
-                "user": f"{user.first_name} {user.last_name}",
+                "user": user,
                 "superuser_links": links,
                 "errors": request.session["errors"],
                 "partial": request.session["form_data"],
@@ -148,12 +170,12 @@ def edit(request, user_id):
     View to request superuser input to edit a user's info. 
     Upon submission, form data is sent to the `update` view
     """
-    if not request.user.is_authenticated:
+    if not request.user.is_authenticated :
         # user is not logged in
         return redirect("/")
     else:
         user = request.user
-        if user.is_super:
+        if user.is_super or user.id == user_id:
             links = "<li class='nav-item'> <a class='nav-link active' href='/super/users'>Users</a></li>"
             # the user id is passed on the url, so retrieve that user's db entry, to prefill the edit form with the current info
 
@@ -162,7 +184,7 @@ def edit(request, user_id):
             if "errors" not in request.session:
                 request.session["errors"] = {}
             context = {
-                "user": f"{user.first_name} {user.last_name}",
+                "user": user,
                 "target_user": User.objects.get(id=user_id),
                 "all_clients": Client.objects.order_by("client_name"),
                 "all_companies": Company.objects.using('buyersonar').order_by('name'),
@@ -193,7 +215,7 @@ def show(request, user_id):
                 client = None
             links = "<li class='nav-item'> <a class='nav-link active' href='/super/users'>Users</a></li>"
             context = {
-                "user": f"{user.first_name} {user.last_name}",
+                "user": user,
                 "target_user": target_user,
                 "client": client,
                 "superuser_links": links,

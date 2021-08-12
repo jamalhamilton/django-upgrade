@@ -116,7 +116,7 @@ def superadmin(request):
                 }
                 all_users.append(mod_user)
             context = {
-                "user": f"{user.first_name} {user.last_name}",
+                "user": user,
                 "all_users": all_users,
                 "superuser_links": links,
                 "attribution": "disabled",
@@ -191,7 +191,7 @@ def login(request):
         if user is not None:
             if user.is_active:
                 auth_login(request, user)
-                return redirect("/superadmin")
+                return redirect("/super/users")
         print(query)
         if len(query) > 0:
             user = query[0]
@@ -200,16 +200,16 @@ def login(request):
                 request.session.clear()
                 if user.is_active:
                     request.session["userid"] = user.id
-                    return redirect("/superadmin")
+                    return redirect("/super/users")
                 else:
                     request.session[
                         "login_error"
                     ] = "Our records indicate that either you do not have an active contract with Audantic, or you have an open invoice. Please contact support@audantic.com to sign back up or arrange payment and continue your access to SSO"
-                    return redirect("/superadmin")
+                    return redirect("/super/users")
         request.session[
             "login_error"
         ] = "The login and password combination did not match any user. Check your credentials. "
-    return redirect("/superadmin")
+    return redirect("/super/users")
 
 
 def reset(request):
