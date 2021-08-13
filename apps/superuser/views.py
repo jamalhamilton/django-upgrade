@@ -298,8 +298,8 @@ def update(request):
         if not request.user.is_authenticated:
             return redirect("/")
         superuser = request.user
-        if not superuser.is_super:
-            return redirect("/reset")
+        #if not superuser.is_super:
+        #    return redirect("/reset")
         # if there are invalid form fields, save error messages to session and send back to the edit form
 
         request.session["errors"] = User.objects.basic_validator(
